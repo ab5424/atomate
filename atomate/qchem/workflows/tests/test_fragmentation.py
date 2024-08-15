@@ -1,6 +1,5 @@
 import json
 import os
-import unittest
 
 from fireworks import FWorker
 from fireworks.core.rocket_launcher import rapidfire
@@ -65,7 +64,11 @@ class TestFragmentation(AtomateTest):
                 molecule=initial_mol,
                 depth=0,
                 do_triplets=False,
-                qchem_input_params={"scf_algorithm": "gdm", "basis_set": "6-311++g*"},
+                qchem_input_params={
+                    "scf_algorithm": "gdm",
+                    "basis_set": "6-311++g*",
+                    "overwrite_inputs": {"rem": {"method": "wb97xd"}},
+                },
             )
             # use powerup to replace run with fake run
             ref_dirs = {
@@ -133,7 +136,3 @@ class TestFragmentation(AtomateTest):
 
             self.assertEqual(len(FWAction_patch.call_args[1]["additions"]), 0)
         mmdb.reset()
-
-
-if __name__ == "__main__":
-    unittest.main()

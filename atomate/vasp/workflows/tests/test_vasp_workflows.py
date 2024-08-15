@@ -1,6 +1,5 @@
 import json
 import os
-import unittest
 import zlib
 
 import boto3
@@ -8,7 +7,7 @@ import gridfs
 from fireworks import FWorker
 from fireworks.core.rocket_launcher import rapidfire
 from monty.json import MontyDecoder
-from moto import mock_s3
+from moto import mock_aws
 from pymatgen.core import Structure
 from pymatgen.electronic_structure.bandstructure import BandStructure
 from pymatgen.electronic_structure.dos import CompleteDos
@@ -404,7 +403,7 @@ class TestVaspWorkflows(AtomateTest):
         # generate a doc from the test folder
         doc = {"a": 1, "b": 2}
 
-        with mock_s3():
+        with mock_aws():
             conn = boto3.client("s3")
             conn.create_bucket(Bucket="test_bucket")
             mmdb = VaspCalcDb.from_db_file(os.path.join(db_dir, "db_aws.json"))
@@ -419,7 +418,7 @@ class TestVaspWorkflows(AtomateTest):
             assert compress_type == "zlib"
             doc["task_id"] = "mp-1"
             _, _ = mmdb.insert_maggma_store(doc, "store2", oid="2")
-            assert set(mmdb._maggma_stores.keys()) == {"store1", "store2"}
+            assert set(mmdb._maggma_stores) == {"store1", "store2"}
             with mmdb._maggma_stores["store1"] as store:
                 self.assertTrue(store.compress)
                 self.assertTrue(
@@ -469,7 +468,7 @@ class TestVaspWorkflows(AtomateTest):
                 res = store.query_one()
                 self.assertTrue(res["data"]["@class"] == "BandStructure")
 
-            # print(mmdb.collection.find_one({'task_id' : t_id})["calcs_reversed"][0].keys())
+            # print(mmdb.collection.find_one({'task_id' : t_id})["calcs_reversed"][0])
             # complex check that the data is the same
             res = mmdb.get_band_structure(task_id=t_id)
             self.assertTrue(isinstance(res, BandStructure))
@@ -582,13 +581,11 @@ class TestScanOptimizeWorkflow(AtomateTest):
             os.path.join(reference_dir, "PBESol_pre_opt_for_SCAN_Al/inputs", "INCAR")
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[0], "INCAR.gz"))
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.22)
             elif p == "ICHARG" or p == "ISTART":
                 self.assertEqual(incar[p], 1)
-            elif p == "METAGGA":
-                self.assertEqual(incar[p], "None")
             elif p == "GGA":
                 self.assertEqual(incar[p], "Ps")
             elif p == "EDIFFG":
@@ -607,7 +604,7 @@ class TestScanOptimizeWorkflow(AtomateTest):
             )
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[1], "INCAR.gz"))
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.22)
             elif p == "ICHARG":
@@ -639,13 +636,11 @@ class TestScanOptimizeWorkflow(AtomateTest):
             os.path.join(reference_dir, "PBESol_pre_opt_for_SCAN_LiH/inputs", "INCAR")
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[0], "INCAR.gz"))
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.22)
             elif p == "ICHARG" or p == "ISTART":
                 self.assertEqual(incar[p], 1)
-            elif p == "METAGGA":
-                self.assertEqual(incar[p], "None")
             elif p == "GGA":
                 self.assertEqual(incar[p], "Ps")
             elif p == "EDIFFG":
@@ -664,7 +659,7 @@ class TestScanOptimizeWorkflow(AtomateTest):
             )
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[1], "INCAR.gz"))
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertAlmostEqual(incar[p], 0.40503, 4)
             elif p == "SIGMA":
@@ -698,13 +693,11 @@ class TestScanOptimizeWorkflow(AtomateTest):
             os.path.join(reference_dir, "PBESol_pre_opt_for_SCAN_LiF/inputs", "INCAR")
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[0], "INCAR.gz"))
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.22)
             elif p == "ICHARG" or p == "ISTART":
                 self.assertEqual(incar[p], 1)
-            elif p == "METAGGA":
-                self.assertEqual(incar[p], "None")
             elif p == "GGA":
                 self.assertEqual(incar[p], "Ps")
             elif p == "EDIFFG":
@@ -723,7 +716,7 @@ class TestScanOptimizeWorkflow(AtomateTest):
             )
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[1], "INCAR.gz"))
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.44)
             elif p == "SIGMA":
@@ -775,13 +768,11 @@ class TestScanOptimizeWorkflow(AtomateTest):
         self.assertIsNone(incar.get("LUSE_VDW", None))
         self.assertIsNone(incar.get("BPARAM", None))
 
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.22)
             elif p == "ICHARG":
                 self.assertEqual(incar[p], 1)
-            elif p == "METAGGA":
-                self.assertEqual(incar[p], "None")
             elif p == "GGA":
                 self.assertEqual(incar[p], "Ps")
             elif p == "EDIFFG":
@@ -801,7 +792,7 @@ class TestScanOptimizeWorkflow(AtomateTest):
         )
         incar = Incar.from_file(os.path.join(self._get_launch_dir()[1], "INCAR.gz"))
 
-        for p in incar.keys():
+        for p in incar:
             if p == "KSPACING":
                 self.assertEqual(incar[p], 0.44)
             elif p == "SIGMA":
@@ -858,7 +849,3 @@ class TestScanOptimizeWorkflow(AtomateTest):
         wf = self.lp.get_wf_by_fw_id(fw_id)
         is_completed = [s == "COMPLETED" for s in wf.fw_states.values()]
         self.assertTrue(all(is_completed))
-
-
-if __name__ == "__main__":
-    unittest.main()

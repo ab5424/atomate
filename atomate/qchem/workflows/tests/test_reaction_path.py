@@ -1,6 +1,5 @@
 import copy
 import os
-import unittest
 
 import numpy as np
 from fireworks import FWorker
@@ -44,12 +43,14 @@ class TestReactionPath(AtomateTest):
             suffix="HERE",
             qchem_input_params={
                 "dft_rung": 4,
+                "basis_set": "def2-tzvppd",
                 "smd_solvent": "custom",
                 "custom_smd": "18.5,1.415,0.00,0.735,20.2,0.00,0.00",
                 "overwrite_inputs": {
                     "rem": {
                         "scf_algorithm": "diis",
                         "thresh": 14,
+                        "method": "wb97xv",
                     }
                 },
             },
@@ -103,7 +104,3 @@ class TestReactionPath(AtomateTest):
         np.testing.assert_allclose(
             mol_copy_back.cart_coords, backwards_final_mol.cart_coords, atol=0.0001
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

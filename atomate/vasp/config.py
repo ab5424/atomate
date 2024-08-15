@@ -11,15 +11,13 @@ STABILITY_CHECK = False
 VASP_CMD = ">>vasp_cmd<<"
 VDW_KERNEL_DIR = ">>vdw_kernel_dir<<"
 DB_FILE = ">>db_file<<"
+SHENGBTE_CMD = ">>shengbte_cmd<<"
 ADD_WF_METADATA = True
 LOBSTER_CMD = ">>lobster_cmd<<"
 
 # whether to use only half the kpoint density in
 # the initial relaxation of a structure optimization for faster performance
 HALF_KPOINTS_FIRST_RELAX = False
-
-# maximum force allowed on atom for successful structure optimization
-RELAX_MAX_FORCE = 0.25
 
 # this is a three-way toggle on what to do if your job looks OK,
 # but is actually unconverged (either electronic or ionic).

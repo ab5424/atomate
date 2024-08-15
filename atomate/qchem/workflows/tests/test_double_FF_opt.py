@@ -1,5 +1,4 @@
 import os
-import unittest
 
 from fireworks import FWorker
 from fireworks.core.rocket_launcher import rapidfire
@@ -44,7 +43,7 @@ class TestDoubleFFOpt(AtomateTest):
             qchem_input_params={
                 "basis_set": "6-311++g**",
                 "scf_algorithm": "diis",
-                "overwrite_inputs": {"rem": {"sym_ignore": "true"}},
+                "overwrite_inputs": {"rem": {"sym_ignore": "true", "method": "wb97xd"}},
             },
         )
         # use powerup to replace run with fake run
@@ -89,7 +88,3 @@ class TestDoubleFFOpt(AtomateTest):
         )
 
         self.assertEqual(first_FF_final_mol, second_FF_initial_mol)
-
-
-if __name__ == "__main__":
-    unittest.main()

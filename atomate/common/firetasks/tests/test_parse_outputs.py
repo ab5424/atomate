@@ -1,5 +1,4 @@
 import os
-import unittest
 
 from fireworks import Firework, Workflow
 from fireworks.core.rocket_launcher import rapidfire
@@ -15,7 +14,8 @@ db_dir = os.path.join(module_dir, "..", "..", "test_files")
 
 
 class TestDrone(AbstractDrone):
-    def __init__(self):
+    @classmethod
+    def setUpClass(cls):
         pass
 
     def assimilate(self, path):
@@ -49,7 +49,3 @@ class TestToDbTask(AtomateTest):
         self.assertEqual(task1["task_id"], 1)
         self.assertEqual(task1["dir_name"], "/test")
         self.assertEqual(task1["drone"], "Test Drone")
-
-
-if __name__ == "__main__":
-    unittest.main()
